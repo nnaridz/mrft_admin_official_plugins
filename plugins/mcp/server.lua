@@ -6,7 +6,7 @@ local INVALID_REQUEST = -32600
 local METHOD_NOT_FOUND = -32601
 local INVALID_PARAMS = -32602
 
-local NO_ARGUMENTS = { type = "object", properties = {}, additionalProperties = false }
+local NO_ARGUMENTS = { type = "object", additionalProperties = false }
 
 local tools = {
     {

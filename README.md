@@ -57,11 +57,18 @@ Every setting needs `key`, `type`, `label` and `default`. `hint` is optional.
 | Type | Value | Control in the menu |
 | --- | --- | --- |
 | `text` | string | Text field |
+| `textarea` | string | Multi-line text field |
 | `number` | number | Number field |
 | `toggle` | boolean | Switch |
 | `secret` | 64 hex characters, or `""` before the first generation | Read-only field with Copy and Regenerate |
 
 To add a variable, add one entry to `settings`. To remove one, delete its entry.
+
+A `code` entry shows a read-only block with a Copy button, such as an example config. It is not a variable, so it has no `key` or `default`, only `label`, `value` and an optional `hint`. In `value`, `{{resource}}` becomes the admin resource name and `{{<key>}}` becomes that setting's current value:
+
+```json
+{ "type": "code", "label": "Example", "value": "{\n  \"url\": \"http://127.0.0.1:30120/{{resource}}/hello\",\n  \"token\": \"{{token}}\"\n}" }
+```
 
 ### server.lua
 
