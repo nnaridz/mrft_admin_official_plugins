@@ -1,0 +1,17 @@
+{
+  "id": "mcp",
+  "name": "MCP Server",
+  "version": "0.1.0",
+  "author": "Moonrift",
+  "icon": "plug",
+  "description": "เชื่อมต่อเซิร์ฟเวอร์กับผู้ช่วย AI ผ่าน MCP",
+  "settings": [
+    {
+      "key": "token",
+      "type": "secret",
+      "label": "Token",
+      "hint": "ส่งเป็น Authorization: Bearer <token> การสร้างใหม่จะทำให้ token เดิมใช้ไม่ได้ทันที",
+      "default": ""
+    }
+  ]
+}

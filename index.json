@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    {
+      "id": "mcp",
+      "path": "plugins/mcp",
+      "files": ["plugin.json", "server.lua"]
+    }
+  ]
+}
