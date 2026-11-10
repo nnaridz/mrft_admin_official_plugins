@@ -4,11 +4,16 @@ Plugins for the Moonrift Admin FiveM resource. Each folder under `plugins/` is o
 
 ## Install a plugin
 
-1. Copy the plugin folder into the `plugins/` folder of the admin resource, so you get `<admin resource>/plugins/<id>/`.
-2. Restart the server.
-3. Open the admin menu, go to **Plugins**, and press the gear on the plugin to set it up.
+1. Open the admin menu, go to **Plugins**, and press **ติดตั้ง** on the plugin.
+2. In the server console, run `refresh`, then `ensure <admin resource>`.
+3. Press the gear on the plugin to set it up.
 
-Only admin groups with the `managePlugins` permission can see and change plugin settings.
+| Permission | Allows |
+| --- | --- |
+| `managePlugins` | See plugins and change their settings |
+| `installPlugins` | Install, update and uninstall plugins. Give it to the server owner only |
+
+To install a plugin that is not in this repository, copy its folder into the `plugins/` folder of the admin resource, so you get `<admin resource>/plugins/<id>/`, then run `refresh` and `ensure <admin resource>`.
 
 ## Write a plugin
 
@@ -78,4 +83,10 @@ end)
 
 ## index.json
 
-`index.json` lists every plugin in this repository with its folder and files. Add your plugin there when you add its folder.
+`index.json` is the list the Plugins page installs from. Add your plugin there when you add its folder:
+
+```json
+{ "id": "example", "files": ["plugin.json", "server.lua"] }
+```
+
+`files` lists every file the installer downloads from `plugins/<id>/`. Only `.lua` and `.json` files are allowed, with no subfolders.
