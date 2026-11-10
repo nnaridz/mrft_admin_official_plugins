@@ -13,7 +13,7 @@ Plugins for the Moonrift Admin FiveM resource. Each folder under `plugins/` is o
 | `managePlugins` | See plugins and change their settings |
 | `installPlugins` | Install, update and uninstall plugins. Give it to the server owner only |
 
-To install a plugin that is not in this repository, copy its folder into the `plugins/` folder of the admin resource, so you get `<admin resource>/plugins/<id>/`, then run `refresh` and `ensure <admin resource>`.
+To install a plugin that is not in this repository, copy its folder into the `storage/plugins/` folder of the admin resource, so you get `<admin resource>/storage/plugins/<id>/`, then run `refresh` and `ensure <admin resource>`.
 
 ## Write a plugin
 
