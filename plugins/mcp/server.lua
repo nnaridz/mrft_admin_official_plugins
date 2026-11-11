@@ -135,10 +135,7 @@ local function refuse(res, status, text, headers)
     res.send(text)
 end
 
-SetHttpHandler(function(req, res)
-    if req.path ~= "/mcp" then
-        return refuse(res, 404, "Not found")
-    end
+local function handle(req, res)
     if req.method ~= "POST" then
         return refuse(res, 405, "Method not allowed", { Allow = "POST" })
     end
@@ -176,4 +173,17 @@ SetHttpHandler(function(req, res)
         res.writeHead(200, { ["Content-Type"] = "application/json" })
         res.send(json.encode(response))
     end)
-end)
+end
+
+-- http://<server>/<admin resource>/mcp
+if plugin.http then
+    plugin.http.route("*", "/", handle)
+else
+    -- Admin resources without the plugin API v2 give the whole resource's HTTP handler to one plugin
+    SetHttpHandler(function(req, res)
+        if req.path ~= "/mcp" then
+            return refuse(res, 404, "Not found")
+        end
+        handle(req, res)
+    end)
+end
