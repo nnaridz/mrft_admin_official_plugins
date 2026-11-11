@@ -3,6 +3,10 @@
     {
       "id": "mcp",
       "files": ["plugin.json", "server.lua"]
+    },
+    {
+      "id": "handling",
+      "files": ["plugin.json", "server.lua", "client.lua", "ui.js", "ui.css"]
     }
   ]
 }

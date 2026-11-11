@@ -391,5 +391,3 @@ Add the folder under `plugins/` and an entry to `index.json`, which is the list 
 ```
 
 `files` lists every file the installer downloads from `plugins/<id>/`. Allowed types are `.lua`, `.json`, `.js` and `.css`, with no subfolders.
-
-Older admin versions only accept `.lua` and `.json`, and they reject the whole list if any entry has another type, so their Plugins page would show no plugins at all. Until the servers using this repository run plugin API v2, keep `.js` and `.css` files out of `index.json`.
