@@ -68,11 +68,15 @@ The id may contain letters, digits, `_` and `-`.
 | `icon` | yes | A [Lucide](https://lucide.dev/icons) icon name, shown on the Plugins page |
 | `settings` | yes | Values an admin can change in the menu. Use `[]` for none: older admin versions fail to load a plugin without the field |
 | `permission` | no | A permission key. When set, only admins whose group has it get the client code and the menu page. Without it, every admin gets them |
-| `client` | no | File name of the client code |
-| `ui.script`, `ui.style` | no | File names of the menu page code and its styles |
+| `client` | no | File name of the client code. Must be a `.lua` file other than `server.lua` |
+| `ui.script`, `ui.style` | no | File names of the menu page code (a `.js` file) and its styles (a `.css` file) |
 | `ui.page.label`, `ui.page.icon` | no | Sidebar text and Lucide icon for the page. They default to the id and `puzzle` |
 
 A permission key only works once the server owner adds it to the groups in the admin resource's `config.permissions`, for example `["example"] = true`. Say which keys your plugin needs in its description or hint.
+
+The client and menu files are sent to admins' games, so never put secrets in them. Settings saved in `config.json` stay on the server. If `client`, `ui.script` or `ui.style` names a file of the wrong type, or a server-only file, the plugin is left out for admins and the server console says why; its `server.lua` still runs.
+
+The `Plugin(id)` handle is the only way into the admin core. Older plugins that used the `Internal` global must switch to it.
 
 ### Settings
 
