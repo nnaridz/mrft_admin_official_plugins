@@ -264,10 +264,10 @@ end, false)
 
 ## Menu page API
 
-`ui.js` runs in the admin menu. It registers one function under the plugin id, which the menu calls once with a context:
+`ui.js` is an ES module that runs in the admin menu. Its default export is a function, which the menu calls once with a context:
 
 ```js
-window.mrftPlugin['example'] = (ctx) => {
+export default (ctx) => {
   ctx.page({
     mount($host) {
       const $count = $('<span>', { text: '-' });
@@ -318,7 +318,9 @@ Use `ctx.ui` so the page looks like the rest of the menu. All of these return jQ
 
 `ui.css` is added to the whole menu, so start every selector with a class of your own, such as `.example-row`, so you do not restyle the core pages. jQuery (`$`) is available.
 
-If `ui.js` throws, the menu shows a "plugin failed to load" toast and the other plugins still load. Open the NUI devtools (`nui_devtools` in the F8 console) to see the error.
+Because `ui.js` is a module, it runs in strict mode and its top-level variables stay private to the plugin. It must be a single file: the menu loads it from text, so it cannot `import` other files of the plugin.
+
+If `ui.js` fails to load, throws, or has no default export, the menu shows a "plugin failed to load" toast and the other plugins still load. Open the NUI devtools (`nui_devtools` in the F8 console) to see the error; it points at `plugin/<id>/ui.js`.
 
 ## How the three parts talk
 
