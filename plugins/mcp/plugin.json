@@ -1,7 +1,7 @@
 {
   "id": "mcp",
   "name": "MCP Server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Moonrift",
   "icon": "plug",
   "description": "เชื่อมต่อเซิร์ฟเวอร์กับผู้ช่วย AI ผ่าน MCP",
@@ -12,6 +12,27 @@
       "label": "Token",
       "hint": "ส่งเป็น Authorization: Bearer <token> การสร้างใหม่จะทำให้ token เดิมใช้ไม่ได้ทันที",
       "default": ""
+    },
+    {
+      "key": "allow_moderation",
+      "type": "toggle",
+      "label": "อนุญาตการลงโทษ",
+      "hint": "kick, ban, unban, announce",
+      "default": false
+    },
+    {
+      "key": "allow_players",
+      "type": "toggle",
+      "label": "อนุญาตจัดการผู้เล่น",
+      "hint": "set_job, set_group, give_items, player_action",
+      "default": false
+    },
+    {
+      "key": "allow_execute",
+      "type": "toggle",
+      "label": "อนุญาตรันโค้ด",
+      "hint": "execute_server, execute_client ทุกครั้งที่รันจะถูกส่งเข้า webhook",
+      "default": false
     },
     {
       "type": "code",
