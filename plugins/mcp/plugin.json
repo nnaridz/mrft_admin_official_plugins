@@ -1,7 +1,7 @@
 {
   "id": "mcp",
   "name": "MCP Server",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "Moonrift",
   "icon": "plug",
   "description": "เชื่อมต่อเซิร์ฟเวอร์กับผู้ช่วย AI ผ่าน MCP",
@@ -28,10 +28,24 @@
       "default": false
     },
     {
+      "key": "allow_scheduler",
+      "type": "toggle",
+      "label": "อนุญาตจัดการ Scheduler",
+      "hint": "create_schedule, update_schedule, delete_schedule, run_schedule",
+      "default": false
+    },
+    {
+      "key": "allow_executor",
+      "type": "toggle",
+      "label": "อนุญาตแก้ไข Executor",
+      "hint": "แก้โค้ด เปิดและปิดแท็บ เลือกเป้าหมาย บันทึกสคริปต์ ในหน้า Executor ของแอดมิน",
+      "default": false
+    },
+    {
       "key": "allow_execute",
       "type": "toggle",
       "label": "อนุญาตรันโค้ด",
-      "hint": "execute_server, execute_client ทุกครั้งที่รันจะถูกส่งเข้า webhook",
+      "hint": "execute_server, execute_client, executor_run ทุกครั้งที่รันจะถูกส่งเข้า webhook",
       "default": false
     },
     {

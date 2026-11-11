@@ -137,6 +137,32 @@ Calls that touch the database (`bans.*`) wait for the query, so they must run in
 | `plugin.bans.remove(adminId, identifier)` | boolean | Lifts a ban. True if one was removed |
 | `plugin.bans.find(identifier)` | table or nil | The active ban on that identifier: `{ identifier, name, reason, banned_at, expires_at }`. Times are unix seconds, and `expires_at` is nil for a permanent ban |
 | `plugin.reports.list()` | array | Open reports: `{ caseId, playerId, name, profile, message, category, category_label, coords, screenshot_url, date }` |
+| `plugin.executor.call(adminId, op, args)` | table | Reads or edits an online admin's Executor page, see [Executor](#executor). Waits up to 5 seconds for the answer, so call it inside a handler or thread. Errors if the player is not an online admin, does not answer, or the op fails |
+| `plugin.scheduler.list()` | array | Every scheduler entry: `{ id, name, enabled, trigger_type, trigger_data, target_data, actions }` |
+| `plugin.scheduler.get(id)` | table or nil | One entry by id |
+| `plugin.scheduler.save(entry)` | table | Creates the entry when `entry.id` is empty, replaces it otherwise, and returns it. No admin permission check: validate the fields first, the scheduler reads them on every tick |
+| `plugin.scheduler.delete(id)` | | Deletes an entry. Errors if it does not exist |
+| `plugin.scheduler.run(id)` | | Runs an entry's actions now, without its trigger |
+
+### Executor
+
+`plugin.executor.call(adminId, op, args)` runs one op in that admin's menu. Edits show on their Executor page right away. Tabs are named by the `id` that `state` returns.
+
+| op | args | Returns |
+| --- | --- | --- |
+| `state` | | `{ tabs = { { id, label, script, active, lines } }, option, source, options }`. `option` is `client`, `server` or `seperate`; `options` lists the ones that admin may pick |
+| `readTab` | `{ tab }` | The tab info plus `code` |
+| `workspace` | | `{ folders = { { id, name } }, scripts = { { key, label, folder } } }` |
+| `readScript` | `{ key }` | `{ key, label, code, folderId }` |
+| `setCode` | `{ tab, code }` | The tab info |
+| `newTab` | `{ label?, code? }` | The new tab's info. It becomes the active tab |
+| `openScript` | `{ key }` | The info of the tab that shows the script |
+| `activate` | `{ tab }` | The tab info |
+| `closeTab` | `{ tab }` | `{ tabs }`. The last tab cannot be closed |
+| `setOption` | `{ option, source? }` | `{ option, source }` |
+| `saveTab` | `{ tab, label? }` | The tab info, with its `script` key |
+
+`call` only reads and edits the page. To run the code, read it with `readTab` and run it yourself.
 
 ### Actions
 

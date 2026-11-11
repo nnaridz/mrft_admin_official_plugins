@@ -18,6 +18,9 @@ local function object(properties, required)
 end
 
 local PLAYER_ID = { type = "integer", description = "Server id of an online player" }
+local ADMIN_ID = { type = "integer", description = "Server id of an online admin; the tool acts on that admin's Executor page, and edits show there live" }
+local TAB_ID = { type = "integer", description = "Tab id from executor_state" }
+local SCHEDULE_ID = { type = "string", description = "Schedule id from list_schedules" }
 
 local function onlinePlayer(playerId)
     if not GetPlayerName(playerId) then
@@ -132,6 +135,125 @@ local function runOnServer(code)
     return { ok = true, result = serializable(value), printed = printed }
 end
 
+local function executor(adminId, op, args)
+    return plugin.executor.call(adminId, op, args)
+end
+
+local function activeTab(state)
+    for i = 1, #state.tabs do
+        if state.tabs[i].active then
+            return state.tabs[i].id
+        end
+    end
+end
+
+local function idList(text)
+    local ids = {}
+    for part in text:gmatch("[^,%s]+") do
+        ids[#ids + 1] = tonumber(part) or error(("Source %q is not a server id"):format(part))
+    end
+    if #ids == 0 then
+        error("The seperate option has no source ids; set them with executor_set_target")
+    end
+    return ids
+end
+
+local TRIGGER_TYPES = { "time", "countdown", "event", "condition" }
+local TARGET_TYPES = { "all", "job", "nearby", "random", "specific", "trigger" }
+local TARGET_DETAIL = { job = true, nearby = true, specific = true }
+local ACTION_FIELDS = {
+    give_item = { "items" },
+    remove_item = { "items" },
+    execute_command = { "command" },
+    send_announcement = { "message" },
+    trigger_event = { "event_name" },
+    trigger_client_event = { "event_name" },
+    set_weather = { "weather" },
+    set_time = { "hour", "minute" }
+}
+
+local TRIGGER_FIELDS = {
+    time = function(data)
+        if data.repeat_type == "interval" then return { "repeat_type", "interval_value" } end
+        if data.repeat_type == "weekly" then return { "repeat_type", "time", "weekly_day" } end
+        if data.repeat_type == "monthly" then return { "repeat_type", "time", "monthly_day" } end
+        return { "repeat_type", "time" }
+    end,
+    countdown = function() return { "delay" } end,
+    event = function() return { "event_name" } end,
+    condition = function() return { "condition_type", "condition_operator", "condition_value", "check_interval" } end
+}
+
+local function needFields(values, fields, what)
+    for i = 1, #fields do
+        local value = values[fields[i]]
+        if value == nil or value == "" then
+            error(("%s needs %s"):format(what, fields[i]))
+        end
+    end
+end
+
+-- The scheduler loops read these fields on every tick, so one missing field would stop them
+local function checkSchedule(data)
+    local fields = TRIGGER_FIELDS[data.trigger_type] or error(("Unknown trigger_type %s"):format(tostring(data.trigger_type)))
+    needFields(data.trigger_data, fields(data.trigger_data), "trigger_data")
+    needFields(data.target_data, TARGET_DETAIL[data.target_data.type] and { "type", "detail" } or { "type" }, "target_data")
+    for i = 1, #data.actions do
+        local action = data.actions[i]
+        needFields(action, ACTION_FIELDS[action.type] or error(("Unknown action type %s"):format(tostring(action.type))), "action " .. i)
+    end
+    return data
+end
+
+local function sortedKeys(map)
+    local list = {}
+    for key in pairs(map) do
+        list[#list + 1] = key
+    end
+    table.sort(list)
+    return list
+end
+
+local SCHEDULE_FIELDS = {
+    name = { type = "string", minLength = 1 },
+    enabled = { type = "boolean" },
+    trigger_type = { type = "string", enum = TRIGGER_TYPES },
+    trigger_data = {
+        type = "object",
+        description = "time: repeat_type once|daily|weekly|monthly|interval, time \"HH:MM\" (not for interval), weekly_day 1-7 (1 = Sunday), monthly_day 1-31, interval_value in minutes. countdown: delay in seconds; runs once, then disables itself. event: event_name, a server event that fires it. condition: condition_type online_players|police_online|uptime (hours), condition_operator > < == >= <=, condition_value, check_interval in seconds; fires each time the condition turns true"
+    },
+    target_data = {
+        type = "object",
+        description = "type all|job|nearby|random|specific|trigger. detail: the job name for job; a radius around the triggering player, or \"x,y,z,radius\", for nearby; comma separated server ids for specific. trigger is the player who fired the event",
+        properties = { type = { type = "string", enum = TARGET_TYPES }, detail = { type = "string" } },
+        required = { "type" }
+    },
+    actions = {
+        type = "array",
+        description = "Run in order. give_item/remove_item: items [{item_name, quantity}]. execute_command: command; {target} becomes each target's server id. send_announcement: message. trigger_event/trigger_client_event: event_name, params as a JSON array string. set_weather: weather such as CLEAR, RAIN, THUNDER. set_time: hour, minute",
+        items = {
+            type = "object",
+            properties = { type = { type = "string", enum = sortedKeys(ACTION_FIELDS) } },
+            required = { "type" }
+        }
+    }
+}
+
+local function scheduleSchema(required, extra)
+    local properties = {}
+    for key, value in pairs(SCHEDULE_FIELDS) do
+        properties[key] = value
+    end
+    for key, value in pairs(extra) do
+        properties[key] = value
+    end
+    return object(properties, required)
+end
+
+local function existingSchedule(id)
+    return plugin.scheduler.get(id) or error(("Schedule %s does not exist"):format(tostring(id)))
+end
+
 local function playerAddons()
     local names = {}
     for name, addon in pairs(config.player_addons) do
@@ -240,6 +362,199 @@ local tools = {
         run = function(args)
             local limit = args.limit or HISTORY_SIZE
             return { actions = { table.unpack(history, 1, math.min(limit, #history)) } }
+        end
+    },
+    {
+        name = "executor_state",
+        description = "An admin's Executor page: open tabs (id, label, saved script key, active, line count), the run option (client = that admin's own game, server, seperate = the players in source), the source ids and the options that admin may use.",
+        inputSchema = object({ admin = ADMIN_ID }, { "admin" }),
+        run = function(args)
+            return executor(args.admin, "state")
+        end
+    },
+    {
+        name = "executor_read_tab",
+        description = "The code in one of an admin's Executor tabs.",
+        inputSchema = object({ admin = ADMIN_ID, tab = TAB_ID }, { "admin", "tab" }),
+        run = function(args)
+            return executor(args.admin, "readTab", { tab = args.tab })
+        end
+    },
+    {
+        name = "executor_workspace",
+        description = "Scripts saved in an admin's Executor workspace (key, label, folder id) and their folders.",
+        inputSchema = object({ admin = ADMIN_ID }, { "admin" }),
+        run = function(args)
+            return executor(args.admin, "workspace")
+        end
+    },
+    {
+        name = "executor_read_script",
+        description = "The label, folder and code of a saved workspace script.",
+        inputSchema = object({ admin = ADMIN_ID, key = { type = "string", description = "Script key from executor_workspace" } }, { "admin", "key" }),
+        run = function(args)
+            return executor(args.admin, "readScript", { key = args.key })
+        end
+    },
+    {
+        name = "executor_set_code",
+        group = "allow_executor",
+        description = "Replaces the code in an Executor tab.",
+        inputSchema = object({ admin = ADMIN_ID, tab = TAB_ID, code = { type = "string" } }, { "admin", "tab", "code" }),
+        run = function(args)
+            return executor(args.admin, "setCode", { tab = args.tab, code = args.code })
+        end
+    },
+    {
+        name = "executor_new_tab",
+        group = "allow_executor",
+        description = "Opens a new Executor tab, with optional label and code, and makes it active.",
+        inputSchema = object({ admin = ADMIN_ID, label = { type = "string", minLength = 1 }, code = { type = "string" } }, { "admin" }),
+        run = function(args)
+            return executor(args.admin, "newTab", { label = args.label, code = args.code })
+        end
+    },
+    {
+        name = "executor_open_script",
+        group = "allow_executor",
+        description = "Opens a saved workspace script in a tab, or switches to its tab when it is already open.",
+        inputSchema = object({ admin = ADMIN_ID, key = { type = "string", description = "Script key from executor_workspace" } }, { "admin", "key" }),
+        run = function(args)
+            return executor(args.admin, "openScript", { key = args.key })
+        end
+    },
+    {
+        name = "executor_select_tab",
+        group = "allow_executor",
+        description = "Makes an Executor tab the active one.",
+        inputSchema = object({ admin = ADMIN_ID, tab = TAB_ID }, { "admin", "tab" }),
+        run = function(args)
+            return executor(args.admin, "activate", { tab = args.tab })
+        end
+    },
+    {
+        name = "executor_close_tab",
+        group = "allow_executor",
+        description = "Closes an Executor tab without saving. The last tab cannot be closed.",
+        inputSchema = object({ admin = ADMIN_ID, tab = TAB_ID }, { "admin", "tab" }),
+        run = function(args)
+            return executor(args.admin, "closeTab", { tab = args.tab })
+        end
+    },
+    {
+        name = "executor_set_target",
+        group = "allow_executor",
+        description = "Sets where the Executor runs code: client (the admin's own game), server, or seperate with source as comma separated server ids.",
+        inputSchema = object({
+            admin = ADMIN_ID,
+            option = { type = "string", enum = { "client", "server", "seperate" } },
+            source = { type = "string", description = "Server ids such as \"1, 2\", for seperate" }
+        }, { "admin", "option" }),
+        run = function(args)
+            return executor(args.admin, "setOption", { option = args.option, source = args.source })
+        end
+    },
+    {
+        name = "executor_save_tab",
+        group = "allow_executor",
+        description = "Saves a tab to the workspace, overwriting its script when it was opened from one. The label is at most 16 characters and defaults to the tab's label.",
+        inputSchema = object({ admin = ADMIN_ID, tab = TAB_ID, label = { type = "string", minLength = 1 } }, { "admin", "tab" }),
+        run = function(args)
+            return executor(args.admin, "saveTab", { tab = args.tab, label = args.label })
+        end
+    },
+    {
+        name = "executor_run",
+        group = "allow_execute",
+        description = "Runs an Executor tab (default: the active one) with the page's current option and source. Returns the same result as execute_server or execute_client.",
+        inputSchema = object({ admin = ADMIN_ID, tab = TAB_ID }, { "admin" }),
+        run = function(args)
+            local state = executor(args.admin, "state")
+            local tab = executor(args.admin, "readTab", { tab = args.tab or activeTab(state) })
+            if state.option == "server" then
+                return runOnServer(tab.code)
+            end
+            local ids = state.option == "client" and { args.admin } or idList(state.source)
+            return { results = runOnClients(tab.code, ids) }
+        end
+    },
+    {
+        name = "list_schedules",
+        description = "Every scheduler entry: id, name, enabled, trigger_type, trigger_data, target_data and actions.",
+        inputSchema = NO_ARGUMENTS,
+        run = function()
+            return { schedules = plugin.scheduler.list() }
+        end
+    },
+    {
+        name = "get_schedule",
+        description = "One scheduler entry by id.",
+        inputSchema = object({ id = SCHEDULE_ID }, { "id" }),
+        run = function(args)
+            return existingSchedule(args.id)
+        end
+    },
+    {
+        name = "create_schedule",
+        group = "allow_scheduler",
+        description = "Creates a scheduler entry and returns it with its new id.",
+        inputSchema = scheduleSchema({ "name", "enabled", "trigger_type", "trigger_data", "target_data", "actions" }, {}),
+        run = function(args)
+            return plugin.scheduler.save(checkSchedule({
+                name = args.name,
+                enabled = args.enabled,
+                trigger_type = args.trigger_type,
+                trigger_data = args.trigger_data,
+                target_data = args.target_data,
+                actions = args.actions
+            }))
+        end
+    },
+    {
+        name = "update_schedule",
+        group = "allow_scheduler",
+        description = "Changes a scheduler entry, such as enabling it or adding an action. Fields left out keep their value; actions, when given, replaces the whole list, so read the entry first to add or edit one action.",
+        inputSchema = scheduleSchema({ "id" }, { id = SCHEDULE_ID }),
+        run = function(args)
+            local current = existingSchedule(args.id)
+            local triggerData = current.trigger_data
+            if args.trigger_data then
+                triggerData = args.trigger_data
+                triggerData.layout = current.trigger_data.layout
+            end
+            local enabled = current.enabled
+            if args.enabled ~= nil then
+                enabled = args.enabled
+            end
+            return plugin.scheduler.save(checkSchedule({
+                id = current.id,
+                name = args.name or current.name,
+                enabled = enabled,
+                trigger_type = args.trigger_type or current.trigger_type,
+                trigger_data = triggerData,
+                target_data = args.target_data or current.target_data,
+                actions = args.actions or current.actions
+            }))
+        end
+    },
+    {
+        name = "delete_schedule",
+        group = "allow_scheduler",
+        description = "Deletes a scheduler entry.",
+        inputSchema = object({ id = SCHEDULE_ID }, { "id" }),
+        run = function(args)
+            plugin.scheduler.delete(args.id)
+            return { deleted = args.id }
+        end
+    },
+    {
+        name = "run_schedule",
+        group = "allow_scheduler",
+        description = "Runs a scheduler entry's actions now, without waiting for its trigger. The trigger target has no player here, so it reaches nobody.",
+        inputSchema = object({ id = SCHEDULE_ID }, { "id" }),
+        run = function(args)
+            plugin.scheduler.run(args.id)
+            return { ran = args.id }
         end
     },
     {
