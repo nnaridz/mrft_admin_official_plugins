@@ -1,12 +1,24 @@
 {
+  "signed": "2026-11-12T11:47:22.064Z",
   "plugins": [
     {
-      "id": "mcp",
-      "files": ["plugin.json", "server.lua"]
+      "id": "handling",
+      "version": "1.0.0",
+      "files": {
+        "client.lua": "d393cca80e4d39895e2c8fda1531f2eb9d83cabc328e1460b4634fa2d1b42e09",
+        "plugin.json": "4529de85d75addeab8c555cb2520b10313b774049a10556fe375edfee25edd8f",
+        "server.lua": "e7fdd75ed2f97107b6c40a06c710f04cd29f2d969316162114b7e9a2541e376c",
+        "ui.css": "c2847a7e51447423f94eeaa5d77cb8b772e41c9ef71cccb982fa4870ca8d8ac0",
+        "ui.js": "ebd81a86c4de097c0853086bafd27973752b1531187b96d44ab8c2aa4e36d6d3"
+      }
     },
     {
-      "id": "handling",
-      "files": ["plugin.json", "server.lua", "client.lua", "ui.js", "ui.css"]
+      "id": "mcp",
+      "version": "0.5.0",
+      "files": {
+        "plugin.json": "b30fae0ce3bd68efab77b56ea2da85b7bc1bd1c4e9b21958b69272555c8c0afa",
+        "server.lua": "2c5b30ba339ae8c2f3e8c4e5e369b91f08dc5fd46b6ec9a16005ecd60202d820"
+      }
     }
   ]
 }

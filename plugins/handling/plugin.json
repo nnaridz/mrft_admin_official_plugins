@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "author": "Moonrift",
   "icon": "car-front",
-  "description": "แก้ handling ของรถที่นั่งอยู่แบบสด แล้วคัดลอกออกเป็น XML ต้องมีสิทธิ์ handlingEditor",
+  "description": "แก้ handling ของรถที่นั่งอยู่แบบสด แล้วคัดลอกออกเป็น XML",
   "permission": "handlingEditor",
   "client": "client.lua",
   "ui": {

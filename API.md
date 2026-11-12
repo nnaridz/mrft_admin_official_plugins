@@ -384,10 +384,6 @@ end
 
 ## Publishing in this repository
 
-Add the folder under `plugins/` and an entry to `index.json`, which is the list the Plugins page installs from:
+Add the folder under `plugins/` and run `node sign.js`. It rebuilds `index.json`, the list the Plugins page installs from, with the SHA-256 of every file in each plugin folder, and signs it into `index.json.sig`. Allowed types are `.lua`, `.json`, `.js` and `.css`, with no subfolders.
 
-```json
-{ "id": "example", "files": ["plugin.json", "server.lua", "client.lua", "ui.js", "ui.css"] }
-```
-
-`files` lists every file the installer downloads from `plugins/<id>/`. Allowed types are `.lua`, `.json`, `.js` and `.css`, with no subfolders.
+The admin menu refuses an index whose signature does not match, an index older than the last one it accepted, and any file whose hash differs from the index. Signing needs the private key, which is kept outside this repository; `node sign.js init` creates a new one and prints the public key the admin menu checks against.
