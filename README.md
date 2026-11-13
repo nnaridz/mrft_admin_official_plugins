@@ -5,7 +5,7 @@ Plugins for the Moonrift Admin FiveM resource. Each folder under `plugins/` is o
 ## Install a plugin
 
 1. Open the admin menu, go to **Plugins**, and press **ติดตั้ง** on the plugin.
-2. In the server console, run `refresh`, then `ensure <admin resource>`.
+2. In the server console, run `ensure <admin resource>`.
 3. Press the gear on the plugin to set it up.
 
 | Permission | Allows |
@@ -13,7 +13,7 @@ Plugins for the Moonrift Admin FiveM resource. Each folder under `plugins/` is o
 | `managePlugins` | See plugins and change their settings |
 | `installPlugins` | Install, update and uninstall plugins. Give it to the server owner only |
 
-To install a plugin that is not in this repository, copy its folder into the `storage/plugins/` folder of the admin resource, so you get `<admin resource>/storage/plugins/<id>/`, then run `refresh` and `ensure <admin resource>`.
+To install a plugin that is not in this repository, copy its folder into the `storage/plugins/` folder of the admin resource, so you get `<admin resource>/storage/plugins/<id>/`, then run `ensure <admin resource>`.
 
 ## Write a plugin
 
