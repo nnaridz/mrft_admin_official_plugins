@@ -1,0 +1,15 @@
+{
+  "id": "todos",
+  "name": "Todos",
+  "version": "1.0.0",
+  "author": "Moonrift",
+  "icon": "list-todo",
+  "description": "บอร์ดโน้ตและเช็กลิสต์ที่แอดมินทุกคนเห็นและแก้ไขร่วมกันแบบสด",
+  "client": "client.lua",
+  "ui": {
+    "script": "ui.js",
+    "style": "ui.css",
+    "page": { "label": "Todos", "icon": "list-todo" }
+  },
+  "settings": []
+}

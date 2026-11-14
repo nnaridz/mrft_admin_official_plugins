@@ -1,5 +1,5 @@
 {
-  "signed": "2026-11-12T11:47:22.064Z",
+  "signed": "2026-11-14T01:36:38.031Z",
   "plugins": [
     {
       "id": "handling",
@@ -18,6 +18,17 @@
       "files": {
         "plugin.json": "b30fae0ce3bd68efab77b56ea2da85b7bc1bd1c4e9b21958b69272555c8c0afa",
         "server.lua": "2c5b30ba339ae8c2f3e8c4e5e369b91f08dc5fd46b6ec9a16005ecd60202d820"
+      }
+    },
+    {
+      "id": "todos",
+      "version": "1.0.0",
+      "files": {
+        "client.lua": "f7ee7363e01f2181314cbbbd68d51677edb5380389b97cacaec599a989124251",
+        "plugin.json": "3ed51e3e5c8cd3c4b87d9fd977eebc7f2f64fa39dd95ca12ea679466464bf837",
+        "server.lua": "061fd14ce69346f1446081fd7586126e4341346b0ba7702f861c467e64a3f9a2",
+        "ui.css": "4fbf99cfe63da7d2e1a577a375d6c2d991d7914ddbaa3e3db7a4c56f4ef9f0e2",
+        "ui.js": "3e4cd226f9481a78e526b2cb207d680b858615be7ce284e9e739bc6f06a97dd5"
       }
     }
   ]

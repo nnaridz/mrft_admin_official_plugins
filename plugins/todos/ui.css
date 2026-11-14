@@ -1,0 +1,47 @@
+.todos .todos-mark { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 16px; background: var(--raised); color: var(--t2); }
+.todos .todos-canvas { position: relative; flex: 1; min-height: 0; overflow: hidden; outline: 0; cursor: grab; background-color: var(--dock); background-image: radial-gradient(circle at 1px 1px, var(--line-strong) 1px, transparent 1.5px); }
+.todos .todos-canvas.panning, .todos .todos-canvas.dragging { cursor: grabbing; }
+.todos .todos-world { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.todos .todos-empty { position: absolute; inset: 0; pointer-events: none; }
+.todos .todos-empty[hidden] { display: none; }
+.todos .todos-hint { position: absolute; left: 16px; bottom: 16px; font-size: 13px; line-height: 18px; color: var(--t3); pointer-events: none; }
+.todos .todos-tools { position: absolute; right: 16px; bottom: 16px; display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-strong); cursor: default; }
+.todos .todos-zoom { width: 40px; text-align: center; }
+
+.todos .todos-card { --todo: var(--t3); position: absolute; left: 0; top: 0; width: 264px; display: flex; flex-direction: column; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--card-border), 0 4px 12px rgba(0, 0, 0, .3); cursor: default; overflow: hidden; transition: opacity .12s; }
+.todos .todos-card::before { content: ""; height: 3px; background: var(--todo); }
+.todos .todos-card.selected { box-shadow: inset 0 0 0 1px var(--accent-border), 0 4px 12px rgba(0, 0, 0, .3); z-index: 1; }
+.todos .todos-card.todos-done { opacity: .65; }
+.todos .todos-card.todos-done.selected { opacity: 1; }
+.todos .todos-card[data-color="red"] { --todo: var(--negative); }
+.todos .todos-card[data-color="amber"] { --todo: var(--warning); }
+.todos .todos-card[data-color="green"] { --todo: var(--positive); }
+.todos .todos-card[data-color="blue"] { --todo: var(--staff); }
+.todos .todos-card[data-color="violet"] { --todo: var(--accent); }
+
+.todos .todos-head { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 6px 0 12px; border-bottom: 1px solid var(--line); cursor: grab; }
+.todos .todos-swatch { flex: none; width: 14px; height: 14px; padding: 0; border-radius: 7px; background: var(--todo); box-shadow: 0 0 0 3px var(--card); transition: transform .12s; }
+.todos .todos-swatch:hover { transform: scale(1.2); }
+.todos .todos-title { flex: 1; min-width: 0; height: 28px; padding: 0 6px; border: 0; border-radius: 6px; background: none; font: inherit; font-weight: 500; color: var(--t1); outline: 0; user-select: text; }
+.todos .todos-title::placeholder { color: var(--t3); font-weight: 400; }
+.todos .todos-title:focus, .todos .todos-text:focus, .todos .todos-add:focus { background: var(--field); box-shadow: inset 0 0 0 1px var(--accent-border); }
+.todos .todos-head .icon-btn { flex: none; width: 28px; height: 28px; color: var(--t3); }
+
+.todos .todos-items { display: flex; flex-direction: column; gap: 2px; padding: 8px 8px 4px; }
+.todos .todos-item { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 2px 0 4px; border-radius: 8px; transition: background-color .12s; }
+.todos .todos-item:hover { background: var(--hover); }
+.todos .todos-item .icon-btn { flex: none; width: 24px; height: 24px; color: var(--t3); opacity: 0; transition: opacity .12s; }
+.todos .todos-item:hover .icon-btn { opacity: 1; }
+.todos .todos-check { display: grid; place-items: center; flex: none; width: 18px; height: 18px; padding: 0; border-radius: 5px; color: transparent; box-shadow: inset 0 0 0 1.5px var(--t3); transition: background-color .12s, box-shadow .12s, color .12s; }
+.todos .todos-check .i { width: 12px; height: 12px; stroke-width: 3; }
+.todos .todos-check:hover { box-shadow: inset 0 0 0 1.5px var(--t1); }
+.todos .todos-check[aria-pressed="true"] { background: var(--positive); color: #0c0c0e; box-shadow: none; }
+.todos .todos-text { flex: 1; min-width: 0; height: 26px; padding: 0 6px; border: 0; border-radius: 6px; background: none; font: inherit; font-size: 13px; color: var(--t2); outline: 0; user-select: text; }
+.todos .todos-item.done .todos-text { color: var(--t3); text-decoration: line-through; }
+.todos .todos-add { height: 30px; margin-top: 2px; padding: 0 8px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 13px; color: var(--t2); outline: 0; user-select: text; }
+.todos .todos-add::placeholder { color: var(--t3); }
+
+.todos .todos-foot { display: flex; align-items: center; gap: 8px; padding: 6px 12px 10px; border-top: 1px solid var(--line); }
+.todos .todos-progress { flex: none; padding: 0 8px; height: 22px; border-radius: 11px; background: var(--raised); font-family: var(--mono); font-size: 11px; line-height: 22px; color: var(--t2); font-variant-numeric: tabular-nums; }
+.todos .todos-progress.todos-done { background: rgba(111, 207, 151, .16); color: var(--positive); }
+.todos .todos-meta { flex: 1; min-width: 0; font-size: 11px; line-height: 14px; color: var(--t3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
