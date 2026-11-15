@@ -820,7 +820,6 @@ end
 if plugin.http then
     plugin.http.route("*", "/", handle)
 else
-    -- Admin resources without the plugin API v2 give the whole resource's HTTP handler to one plugin
     SetHttpHandler(function(req, res)
         if req.path ~= "/mcp" then
             return refuse(res, 404, "Not found")

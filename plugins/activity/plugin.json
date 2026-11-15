@@ -1,0 +1,15 @@
+{
+  "id": "activity",
+  "name": "Admin Activity",
+  "version": "1.0.0",
+  "author": "Moonrift",
+  "icon": "terminal",
+  "description": "บันทึกทุกการกระทำของแอดมิน",
+  "client": "client.lua",
+  "ui": {
+    "script": "ui.js",
+    "style": "ui.css",
+    "page": { "label": "Activity", "icon": "terminal" }
+  },
+  "settings": []
+}

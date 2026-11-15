@@ -1,6 +1,17 @@
 {
-  "signed": "2026-11-14T01:36:38.031Z",
+  "signed": "2026-11-15T04:07:53.178Z",
   "plugins": [
+    {
+      "id": "activity",
+      "version": "1.0.0",
+      "files": {
+        "client.lua": "41d77104cc0b1bf6628e1f9a4ae2dd2e3e9e766ede26bfa96f718d1c66f4d97c",
+        "plugin.json": "11e1ef226305ae4f266c8cb14a215ff70f83acdf00ae90cf6986e13bd63e0ed1",
+        "server.lua": "c27fe7354964067b63ed8c4f1de59fde626aaf4dbef8d1bf48714c9cb473edec",
+        "ui.css": "bef639ba34cd8e2686f2b9ee41d87b1e3498f749389d68a90f1785f52426fdbf",
+        "ui.js": "647073a21bd260aec681e9c2a1cf4a72dfc28872d91dae7acb881d480c172ce4"
+      }
+    },
     {
       "id": "handling",
       "version": "1.0.0",
@@ -17,7 +28,7 @@
       "version": "0.5.0",
       "files": {
         "plugin.json": "b30fae0ce3bd68efab77b56ea2da85b7bc1bd1c4e9b21958b69272555c8c0afa",
-        "server.lua": "2c5b30ba339ae8c2f3e8c4e5e369b91f08dc5fd46b6ec9a16005ecd60202d820"
+        "server.lua": "a37fce9813abe5fd56c47c4622e3c8a2d4eb467dd34d0708ed6c9a9b5a6c3cf6"
       }
     },
     {
